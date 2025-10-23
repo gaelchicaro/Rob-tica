@@ -56,6 +56,7 @@ void setup()
 void loop() 
 {
   componentes()
+  movimento()
 }
 
 void componentes()

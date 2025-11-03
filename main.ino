@@ -102,10 +102,6 @@ else
 }
 
 void bmp280(){
-    Serial.print(F("Temperature = "));
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
-
     Serial.print(F("Pressure = "));
     Serial.print(bmp.readPressure());
     Serial.println(" Pa");
@@ -191,4 +187,5 @@ void Stop() {
   digitalWrite(INT2,LOW);
   digitalWrite(INT3,LOW);
   digitalWrite(INT4,LOW);  
+
 }

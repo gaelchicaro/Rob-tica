@@ -23,15 +23,16 @@ int valor_analogico;
 Adafruit_BMP280 bmp;
 
 //motores
-//Baixar a biblioteca dabble
-#define CUSTOM_SETTINGS
-#define INCLUDE_GAMEPAD_MODULE
-#include <Dabble.h>
-  
-#define INT1 2
-#define INT2 3
-#define INT3 4
-#define INT4 5
+const int IN1 = 8;
+const int IN2 = 9;
+const int ENA = 5;
+
+// Pinos do Motor B (Esquerda/Direita)
+const int IN3 = 10;
+const int IN4 = 11;
+const int ENB = 6;
+
+char comando; // Variável para armazenar o comando recebido via Bluetooth
 
 void setup() 
 {
@@ -43,12 +44,18 @@ void setup()
   pinMode(pino_sinal_analogico, INPUT);
 
   //motores
-  Dabble.begin(9600,7,6);  
-  pinMode(INT1,OUTPUT);
-  pinMode(INT2,OUTPUT);
-  pinMode(INT3,OUTPUT);                                                                    
-  pinMode(INT4,OUTPUT);
-  Stop();
+ pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  // Inicializa comunicação serial com o módulo Bluetooth
+  Serial.begin(9600);
+
+  // Motores desligados inicialmente
+  parar();
 
   //BMP280
   Serial.begin(9600);
@@ -75,26 +82,19 @@ void setup()
  
 void loop() 
 {
- Dabble.processInput();          
-if(GamePad.isUpPressed())
-{
- forward(); 
-}
-else if(GamePad.isDownPressed())
-{
- backward(); 
-}
-else if(GamePad.isLeftPressed())
-{
- left(); 
-}
-else if(GamePad.isRightPressed())
-{
- right(); 
-}
-else
-{
- Stop(); 
+if (Serial.available()) {
+    comando = Serial.read();
+    Serial.println(comando); // Para depuração, mostra o comando recebido
+
+    switch (comando) {
+      case 'F': frente(); break;
+      case 'B': tras(); break;
+      case 'L': esquerda(); break;
+      case 'R': direita(); break;
+      case 'S': parar(); break;
+      default: parar(); break;
+    }
+  }
 }
   bmp280();
   higrometro();
@@ -154,38 +154,48 @@ void DHt11(){
   }
 }
 
-void forward() {
-  digitalWrite(INT1,LOW);
-  digitalWrite(INT2,HIGH);
-  digitalWrite(INT3,HIGH);
-  digitalWrite(INT4,LOW);
+void frente() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
 }
-     
-void backward() {
-  digitalWrite(INT1,HIGH);
-  digitalWrite(INT2,LOW);
-  digitalWrite(INT3,LOW);
-  digitalWrite(INT4,HIGH);
+
+void tras() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
 }
-     
-void left() {
-  digitalWrite(INT1,HIGH);
-  digitalWrite(INT2,LOW);
-  digitalWrite(INT3,HIGH);
-  digitalWrite(INT4,LOW);    
+
+void esquerda() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
 }
-     
-void right() {
-  digitalWrite(INT1,LOW);
-  digitalWrite(INT2,HIGH);
-  digitalWrite(INT3,LOW);
-  digitalWrite(INT4,HIGH);  
+
+void direita() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
 }
-     
-void Stop() {
-  digitalWrite(INT1,LOW);
-  digitalWrite(INT2,LOW);
-  digitalWrite(INT3,LOW);
-  digitalWrite(INT4,LOW);  
+
+void parar() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}  
 
 }
+
